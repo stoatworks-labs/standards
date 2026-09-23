@@ -377,7 +377,8 @@ by hand.
 - **The clock-unit voting** is readout's, which has met Arena; this plugin has not.
   Arena at 60 fps against a 59.94 destination will show a field twice every ~17 s;
   that is the display, and it is untested in a host.
-- **The Windows build is CI-only** and CI cannot run yet.
+- **Windows has only met Arena on software rendering**: v0.1.0's CI build in the
+  fleet gate on win-lab (Arena 7.27.1, llvmpipe). See the README's status.
 - **Not verified at 4K**, only benchmarked there.
 - **The motion compensation is only checked on a pan and one occlusion**, both
   horizontal. Vertical vectors are estimated and applied (rounded to a field line) but

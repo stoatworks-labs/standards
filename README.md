@@ -11,8 +11,8 @@
 > plate's measured G(f) are the stated taps' transfer function; Same returns the
 > fielded input byte for byte; motion compensation smooths a pan to within a pixel
 > and tears only where an occlusion's blocks reach — with sixteen negative controls
-> that prove each check can fail. It has **never been loaded into Resolume**. It is
-> loaded by [oxbow](https://github.com/stoatworks-labs/oxbow), which is a real FFGL
+> that prove each check can fail. It has **never been loaded into Resolume on macOS**; on Windows it passed the
+> fleet Arena gate. On macOS it is loaded by [oxbow](https://github.com/stoatworks-labs/oxbow), which is a real FFGL
 > host and is not Resolume. See [Status](#status).
 
 A field-store standards converter — PAL to NTSC and back — as an FFGL effect for
@@ -68,7 +68,7 @@ top of the conversion's, which is true of any 50 Hz picture on a 60 Hz screen.
 
 | Group | |
 | --- | --- |
-| **Conversion** | Direction (625/50 > 525/59.94, 525/59.94 > 625/50, 625/50 > 525/60, Same), Temporal (Drop/Repeat, Linear, Four Field), Vertical Taps (1, 2, 4, 8), Motion Comp. |
+| **Conversion** | Direction (625/50 > 525/59.94, 525/59.94 > 625/50, 625/50 > 525/60, Same (no conversion)), Temporal (Drop/Repeat, Linear, Four Field), Vertical Taps (1, 2, 4, 8), Motion Comp. |
 | **Display** | Show As (Weave, Bob), Output Size (Native Lines, Host). |
 | **Look** | Softness, Mix. |
 
@@ -114,12 +114,12 @@ figures only.
 
 ### Not established
 
-It has **never been loaded into Resolume**, on either platform. Everything above was
+It has **never been loaded into Resolume on macOS**. Everything above was
 compiled, rendered and measured offline against the real plugin class in a headless
 CGL context, plus an `oxbow` load. How it looks on footage, how eight controls read
 in Arena's inspector, and what Arena's clock does to the field schedule over a long
-session are untested. The Windows build is CI-only and has never run. No OpenFX port
-and no browser demo, neither in scope for 0.1.0. No user guide.
+session are untested. On Windows, v0.1.0's CI build passed the fleet Arena gate 9 of 9 on win-lab (Resolume Arena 7.27.1, Mesa llvmpipe, no GPU, 2026-09-24): it loads from Extra Effects, registers as `SW Standards` / `ST01` / effect, all 14 host controls match the declaration, every control moves the picture, it renders and Arena's log stays clean. The gate's picture is a still, so the judder itself was not seen there. Software rendering says nothing about a GPU or about speed. No OpenFX port
+and no browser demo, neither in scope for 0.1.0. There is a [user guide](https://stoatworks-labs.com/software/standards/guide/).
 
 ## Build
 
