@@ -156,7 +156,7 @@ void main()
 
 	float sad = 0.0;
 	for( int yy = 0; yy < BlockLines; ++yy )
-		for( int xx = 0; xx < BlockWidth; xx += 2 )
+		for( int xx = 0; xx < BlockWidth; ++xx )
 			sad += abs( lumaAt( FieldA, x0 + xx, k0 + yy ) - bAtLineOfA( x0 + xx + dx, k0 + yy + dy ) );
 
 	fragColor = vec4( sad + Lambda * float( abs( dx ) + abs( dy ) ), 0.0, 0.0, 1.0 );

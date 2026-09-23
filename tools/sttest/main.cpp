@@ -1697,7 +1697,7 @@ int runSame( int width, int height, int perturb = 0, bool quiet = false )
 //---------------------------------------------------------------------------
 // --mc
 //
-// A pure translation: a bar moving 3 px per source field, 50 -> 60 with
+// A pure translation: a 1 px bar moving 3 px per source field, 50 -> 60 with
 // Motion Comp. Every destination field must put the bar at its own instant,
 // x0 + v p_j, so the displacement per field is uniform at v 50/60 = 2.5 px.
 // The spec's tolerance, one pixel, is also the method's: the block vector is
@@ -1750,7 +1750,11 @@ int runMc( int width, int height, int perturb = 0, bool quiet = false )
 	const Case cases[] = { { model::kDropRepeat, true }, { model::kLinear, true }, { model::kDropRepeat, false } };
 	for( const Case& cs : cases )
 	{
-		const double v = 3.0, barWidth = 3.0, x0 = 40.0;
+		//A one-pixel bar: at 3 px a field the two halves of a double image
+		//are two runs with a gap, so "one image" can only mean the fields
+		//landed on each other. (With a 3 px bar they touched, read as one
+		//run, and Linear could not tell Motion Comp from none.)
+		const double v = 3.0, barWidth = 1.0, x0 = 40.0;
 		Session s;
 		baseline( s.plugin, d, cs.temporal );
 		set( s.plugin, "Motion Comp", cs.motion ? 1.0f : 0.0f );
