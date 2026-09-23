@@ -107,9 +107,10 @@ establishes:
 | the bundle | universal (`x86_64 arm64`), exports `plugMain`, ad-hoc signs; `oxbow` reports `SW Standards` / `ST01` / `effect` and renders 120 frames through `plugMain` |
 
 Render cost at the defaults, best of three runs of 60 frames after a warm-up,
-`glFinish` both sides, on a GPU shared with other work: **0.10 ms** at 720p,
-**0.19 ms** at 1080p, **0.43 ms** at 4K. Motion Comp adds a block search per source
-pair: **0.77 ms** at 720p, **1.04 ms** at 1080p, **1.80 ms** at 4K. macOS figures only.
+`glFinish` both sides, on a GPU shared with other work: **0.12 ms** at 720p,
+**0.19 ms** at 1080p, **0.42 ms** at 4K. With Motion Comp, which adds a block search
+per source pair: **0.77 ms** at 720p, **1.04 ms** at 1080p, **1.81 ms** at 4K. macOS
+figures only.
 
 ### Not established
 

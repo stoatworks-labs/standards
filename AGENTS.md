@@ -131,7 +131,7 @@ was found by reading the negative controls' detail, not their verdict — the ve
 was "caught", by the Drop/Repeat case alone. With a 1 px bar the check can tell, and
 the plugin then failed it: a one-pixel line on an odd column matched nothing and the
 vectors came back zero. The SAD now reads all sixteen columns (Motion Comp 0.77 ms at
-720p, 1.80 ms at 4K). Read what a negative control failed on, not only that it did.
+720p, 1.81 ms at 4K). Read what a negative control failed on, not only that it did.
 
 ### ☠️ This driver does not round to nearest when it stores half floats
 
@@ -359,9 +359,9 @@ by hand.
 
   | | ms/frame | % of a 60fps frame | with Motion Comp |
   | --- | --- | --- | --- |
-  | 1280×720 | 0.10 | 0.6% | 0.77 |
+  | 1280×720 | 0.12 | 0.7% | 0.77 |
   | 1920×1080 | 0.19 | 1.1% | 1.04 |
-  | 3840×2160 | 0.43 | 2.6% | 1.80 |
+  | 3840×2160 | 0.42 | 2.5% | 1.81 |
 
   Before the motion search was spread across fragments, Motion Comp was 41 ms at every
   raster.
