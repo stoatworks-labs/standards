@@ -2297,15 +2297,18 @@ int runBench( const std::vector< std::string >& settings, int frames )
 	};
 	const Size sizes[] = { { "1280x720  ", 1280, 720 }, { "1920x1080 ", 1920, 1080 }, { "3840x2160 ", 3840, 2160 } };
 	std::printf( "%d frames each, best of three runs, after a 20-frame warm-up, glFinish both sides.\n\n", frames );
-	std::printf( "resolution     ms/frame   %% of a 60fps frame\n" );
+	std::printf( "resolution     ms/frame   %% of a 60fps frame   with Motion Comp\n" );
+	std::vector< std::string > withMotion = settings;
+	withMotion.push_back( "Motion Comp=1" );
 	for( const Size& size : sizes )
 	{
 		const double ms = benchAt( settings, size.width, size.height, frames );
-		std::printf( "%s    %7.3f        %5.1f%%\n", size.name, ms, ms / 16.667 * 100.0 );
+		const double mc = benchAt( withMotion, size.width, size.height, frames );
+		std::printf( "%s    %7.3f        %5.1f%%             %7.3f\n", size.name, ms, ms / 16.667 * 100.0, mc );
 	}
 	std::printf( "\nAt 60 frames a second a 50-field source makes 5 fields in 6 frames and a\n"
-	             "59.94 destination 1 in about 1; each field is one pass. Motion Comp adds a\n"
-	             "block search per source pair; run with --set \"Motion Comp=1\" to measure it.\n" );
+	             "59.94 destination about 1 per frame; each field is a pass over the store's\n"
+	             "lines. Motion Comp adds a block search per source pair (two passes).\n" );
 	return 0;
 }
 
@@ -2317,7 +2320,8 @@ int dumpShaders( const std::string& dir )
 	namespace sh = standards::shaders;
 	const std::pair< const char*, const char* > files[] = {
 		{ "vertex.vert", sh::kVertex },     { "capture.frag", sh::kCapture }, { "field.frag", sh::kField },
-		{ "resample.frag", sh::kResample }, { "motion.frag", sh::kMotion },   { "convert.frag", sh::kConvert },
+		{ "resample.frag", sh::kResample }, { "motion-sad.frag", sh::kMotionSad }, { "motion-pick.frag", sh::kMotionPick },
+		{ "convert.frag", sh::kConvert },
 		{ "display.frag", sh::kDisplay },
 	};
 	for( const auto& f : files )

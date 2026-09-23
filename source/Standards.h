@@ -144,7 +144,8 @@ private:
 	ffglex::FFGLShader captureShader;
 	ffglex::FFGLShader fieldShader;
 	ffglex::FFGLShader resampleShader;
-	ffglex::FFGLShader motionShader;
+	ffglex::FFGLShader motionSadShader;
+	ffglex::FFGLShader motionPickShader;
 	ffglex::FFGLShader convertShader;
 	ffglex::FFGLShader displayShader;
 	ffglex::FFGLScreenQuad quad;
@@ -158,6 +159,7 @@ private:
 	int64_t sourceIndex[ kSourceRing ];
 	standards::PassBuffer destination[ kDestRing ];
 	int64_t destIndex[ kDestRing ];
+	standards::PassBuffer costs;   ///< one SAD per block and candidate
 	standards::PassBuffer vectors;
 	int64_t vectorsPair = 0;
 	bool vectorsValid   = false;

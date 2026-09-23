@@ -90,18 +90,24 @@ void main()
 )";
 
 //---------------------------------------------------------------------------
-// motion: one vector per block, from field A (source field n) to field B
-// (n + 1), by exhaustive SAD on luma. Crude on purpose -- integer pixels,
-// integer field lines, one vector per block, no smoothing, no occlusion
-// reasoning -- because that is what the first motion-compensated converters
-// were, and their failures are the point.
+// motion, in two passes: one vector per block, from field A (source field n)
+// to field B (n + 1), by exhaustive SAD on luma. Crude on purpose -- integer
+// pixels, integer field lines, one vector per block, no smoothing, no
+// occlusion reasoning -- because that is what the first motion-compensated
+// converters were, and their failures are the point.
+//
+// The search is spread across fragments, not looped inside one: the first
+// pass writes one SAD per (block, candidate), the second picks each block's
+// least. A single fragment per block looping over all 165 candidates made
+// the GPU wait on a few thousand long serial loops -- 41 ms a frame at every
+// raster, found by the bench.
 //
 // A and B have opposite parity, so B's lines sit half a line away from A's.
 // B is read AT A's line positions by averaging the two lines either side:
 // the one place a half-line average is right, because it is a comparison and
 // not a picture anybody sees.
 //---------------------------------------------------------------------------
-const char* const kMotion = R"(#version 410 core
+const char* const kMotionSad = R"(#version 410 core
 
 uniform sampler2D FieldA;
 uniform sampler2D FieldB;
@@ -139,34 +145,53 @@ float bAtLineOfA( int x, int k )
 
 void main()
 {
-	int x0 = int( gl_FragCoord.x ) * BlockWidth;
-	int k0 = int( gl_FragCoord.y ) * BlockLines;
+	int across = 2 * SearchX + 1;
+	int down   = 2 * SearchLines + 1;
+	int gx     = int( gl_FragCoord.x );
+	int gy     = int( gl_FragCoord.y );
+	int dx     = gx - ( gx / across ) * across - SearchX;
+	int dy     = gy - ( gy / down ) * down - SearchLines;
+	int x0     = ( gx / across ) * BlockWidth;
+	int k0     = ( gy / down ) * BlockLines;
 
+	float sad = 0.0;
+	for( int yy = 0; yy < BlockLines; ++yy )
+		for( int xx = 0; xx < BlockWidth; xx += 2 )
+			sad += abs( lumaAt( FieldA, x0 + xx, k0 + yy ) - bAtLineOfA( x0 + xx + dx, k0 + yy + dy ) );
+
+	fragColor = vec4( sad + Lambda * float( abs( dx ) + abs( dy ) ), 0.0, 0.0, 1.0 );
+}
+)";
+
+const char* const kMotionPick = R"(#version 410 core
+
+uniform sampler2D Costs;
+uniform int SearchX;
+uniform int SearchLines;
+
+out vec4 fragColor;
+
+void main()
+{
+	int across = 2 * SearchX + 1;
+	int down   = 2 * SearchLines + 1;
+	int bx     = int( gl_FragCoord.x );
+	int by     = int( gl_FragCoord.y );
+
+	//Scanned dy then dx, least first, keeping the first of equals: the same
+	//order a single loop would have, so a tie always resolves the same way.
 	float best  = 1e30;
 	vec2 vector = vec2( 0.0 );
-
-	for( int dy = -SearchLines; dy <= SearchLines; ++dy )
-	{
-		for( int dx = -SearchX; dx <= SearchX; ++dx )
+	for( int j = 0; j < down; ++j )
+		for( int i = 0; i < across; ++i )
 		{
-			float sad = 0.0;
-			for( int yy = 0; yy < BlockLines; ++yy )
-			{
-				int k = k0 + yy;
-				for( int xx = 0; xx < BlockWidth; xx += 2 )
-				{
-					int x = x0 + xx;
-					sad += abs( lumaAt( FieldA, x, k ) - bAtLineOfA( x + dx, k + dy ) );
-				}
-			}
-			float cost = sad + Lambda * float( abs( dx ) + abs( dy ) );
+			float cost = texelFetch( Costs, ivec2( bx * across + i, by * down + j ), 0 ).r;
 			if( cost < best )
 			{
 				best   = cost;
-				vector = vec2( float( dx ), float( dy ) );
+				vector = vec2( float( i - SearchX ), float( j - SearchLines ) );
 			}
 		}
-	}
 
 	fragColor = vec4( vector, best, 1.0 );
 }

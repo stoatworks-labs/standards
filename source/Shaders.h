@@ -1,7 +1,7 @@
 #pragma once
 
 /**
-	The six passes. Every one of them reads with `texelFetch` at integer
+	The passes. Every one of them reads with `texelFetch` at integer
 	coordinates computed in integers: a field is a set of rows, two adjacent
 	rows of a frame are two different moments, and a bilinear sample across
 	them is a sample across time (cadence's first trap). Every interpolation
@@ -17,7 +17,9 @@
 	  capture   host picture   -> the source standard's frame lines (W x Ls)
 	  field     frame lines    -> one field's lines, by parity (W x Ls/2)
 	  resample  a buffer       -> the same buffer at a new width (a resize)
-	  motion    two fields     -> block vectors (crude, SAD, integer)
+	  motion    two fields     -> one SAD per block and candidate, then the
+	                              least per block: block vectors (crude,
+	                              integer)
 	  convert   1-4 fields     -> one destination field (W x Ld/2)
 	  display   a field pair   -> the host's framebuffer, weave or bob
 */
@@ -28,7 +30,8 @@ extern const char* const kVertex;
 extern const char* const kCapture;
 extern const char* const kField;
 extern const char* const kResample;
-extern const char* const kMotion;
+extern const char* const kMotionSad;
+extern const char* const kMotionPick;
 extern const char* const kConvert;
 extern const char* const kDisplay;
 

@@ -157,7 +157,8 @@ FFResult Standards::InitGL( const FFGLViewportStruct* vp )
 		const char* name;
 	} const stages[] = {
 		{ &captureShader, shaders::kCapture, "capture" },    { &fieldShader, shaders::kField, "field" },
-		{ &resampleShader, shaders::kResample, "resample" }, { &motionShader, shaders::kMotion, "motion" },
+		{ &resampleShader, shaders::kResample, "resample" }, { &motionSadShader, shaders::kMotionSad, "motion SAD" },
+		{ &motionPickShader, shaders::kMotionPick, "motion pick" },
 		{ &convertShader, shaders::kConvert, "convert" },    { &displayShader, shaders::kDisplay, "display" },
 	};
 
@@ -218,7 +219,9 @@ bool Standards::ensureStore( int width, const model::Conversion& c )
 	for( auto& b : destination )
 		if( !b.Ensure( width, lfd, kFieldFormat, PassBuffer::Sampling::Nearest ) )
 			return false;
-	return vectors.Ensure( blocksAcross( width ), blocksDown( lfs ), GL_RGBA32F, PassBuffer::Sampling::Nearest );
+	const int across = 2 * shaders::kSearchX + 1, down = 2 * shaders::kSearchLines + 1;
+	return costs.Ensure( blocksAcross( width ) * across, blocksDown( lfs ) * down, GL_RGBA32F, PassBuffer::Sampling::Nearest )
+	       && vectors.Ensure( blocksAcross( width ), blocksDown( lfs ), GL_RGBA32F, PassBuffer::Sampling::Nearest );
 }
 
 void Standards::resampleInto( PassBuffer& buffer, int oldWidth, int newWidth, int height )
@@ -383,26 +386,39 @@ void Standards::estimateMotion( int64_t pair )
 	if( vectorsValid && vectorsPair == pair )
 		return;
 
-	ScopedFBOBinding fbo( vectors.GetGLID(), ScopedFBOBinding::RB_REVERT );
-	vectors.ResizeViewPort();
-	ScopedShaderBinding shader( motionShader.GetGLID() );
-	ScopedSamplerActivation sampler0( 0 );
-	Scoped2DTextureBinding a( sourceTexture( pair ) );
-	ScopedSamplerActivation sampler1( 1 );
-	Scoped2DTextureBinding b( sourceTexture( pair + 1 ) );
+	{
+		ScopedFBOBinding fbo( costs.GetGLID(), ScopedFBOBinding::RB_REVERT );
+		costs.ResizeViewPort();
+		ScopedShaderBinding shader( motionSadShader.GetGLID() );
+		ScopedSamplerActivation sampler0( 0 );
+		Scoped2DTextureBinding a( sourceTexture( pair ) );
+		ScopedSamplerActivation sampler1( 1 );
+		Scoped2DTextureBinding b( sourceTexture( pair + 1 ) );
 
-	motionShader.Set( "FieldA", 0 );
-	motionShader.Set( "FieldB", 1 );
-	motionShader.Set( "ParityA", model::FieldParity( pair ) );
-	motionShader.Set( "ParityB", model::FieldParity( pair + 1 ) );
-	motionShader.Set( "Width", storeWidth );
-	motionShader.Set( "FieldLines", conversion.source.fieldLines );
-	motionShader.Set( "BlockWidth", shaders::kBlockWidth );
-	motionShader.Set( "BlockLines", shaders::kBlockLines );
-	motionShader.Set( "SearchX", shaders::kSearchX );
-	motionShader.Set( "SearchLines", shaders::kSearchLines );
-	motionShader.Set( "Lambda", 1e-3f );
-	quad.Draw();
+		motionSadShader.Set( "FieldA", 0 );
+		motionSadShader.Set( "FieldB", 1 );
+		motionSadShader.Set( "ParityA", model::FieldParity( pair ) );
+		motionSadShader.Set( "ParityB", model::FieldParity( pair + 1 ) );
+		motionSadShader.Set( "Width", storeWidth );
+		motionSadShader.Set( "FieldLines", conversion.source.fieldLines );
+		motionSadShader.Set( "BlockWidth", shaders::kBlockWidth );
+		motionSadShader.Set( "BlockLines", shaders::kBlockLines );
+		motionSadShader.Set( "SearchX", shaders::kSearchX );
+		motionSadShader.Set( "SearchLines", shaders::kSearchLines );
+		motionSadShader.Set( "Lambda", 1e-3f );
+		quad.Draw();
+	}
+	{
+		ScopedFBOBinding fbo( vectors.GetGLID(), ScopedFBOBinding::RB_REVERT );
+		vectors.ResizeViewPort();
+		ScopedShaderBinding shader( motionPickShader.GetGLID() );
+		ScopedSamplerActivation sampler0( 0 );
+		Scoped2DTextureBinding c( costs.TextureID() );
+		motionPickShader.Set( "Costs", 0 );
+		motionPickShader.Set( "SearchX", shaders::kSearchX );
+		motionPickShader.Set( "SearchLines", shaders::kSearchLines );
+		quad.Draw();
+	}
 
 	vectorsPair  = pair;
 	vectorsValid = true;
@@ -651,7 +667,8 @@ FFResult Standards::DeInitGL()
 	captureShader.FreeGLResources();
 	fieldShader.FreeGLResources();
 	resampleShader.FreeGLResources();
-	motionShader.FreeGLResources();
+	motionSadShader.FreeGLResources();
+	motionPickShader.FreeGLResources();
 	convertShader.FreeGLResources();
 	displayShader.FreeGLResources();
 	quad.Release();
@@ -662,6 +679,7 @@ FFResult Standards::DeInitGL()
 		b.Destroy();
 	for( auto& b : destination )
 		b.Destroy();
+	costs.Destroy();
 	vectors.Destroy();
 	scratch.Destroy();
 
