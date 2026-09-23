@@ -13,6 +13,8 @@
 #   shaders       does every shader compile, through a real GLSL compiler
 #                 (tools/check-shaders.sh, which CI runs too), on the exact
 #                 strings `sttest --dump-shaders` writes.
+#   demo          the browser demo's copy of every shader is still the
+#                 plugin's, character for character (demo/tools/check_shaders.py).
 #   offline       the checks that need no GL, and their negative controls:
 #                   --model     the plugin's temporal apertures and vertical
 #                               filters against the stated geometry and
@@ -81,6 +83,23 @@ if out=$(tools/check-shaders.sh "$STTEST" 2>&1); then
 else
 	fail "a shader does not compile"
 	printf '%s\n' "$out"
+fi
+
+step "demo: the browser copy of the shaders"
+# demo/plugin.js cannot include a C++ file, so it carries its own copy of every
+# shader, and two copies drift quietly: the plugin keeps working, the page keeps
+# working, and they stop being the same effect. Character for character --
+# reformatting counts. It says nothing about the page's PORT of the CPU half;
+# only a reader checks that.
+if [ -f demo/tools/check_shaders.py ]; then
+	if out=$(python3 demo/tools/check_shaders.py 2>&1); then
+		pass "$( printf '%s\n' "$out" | tail -1 )"
+	else
+		fail "the demo's shaders have drifted from source/Shaders.cpp"
+		printf '%s\n' "$out" | tail -12
+	fi
+else
+	printf '   skipped: no demo/\n'
 fi
 
 step "offline (no GL)"

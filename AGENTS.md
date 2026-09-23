@@ -383,10 +383,53 @@ by hand.
 - **The motion compensation is only checked on a pan and one occlusion**, both
   horizontal. Vertical vectors are estimated and applied (rounded to a field line) but
   no check moves anything vertically.
-- **No OpenFX port and no browser demo.** Not required for 0.1.0.
+- **No OpenFX port.** Not required for 0.1.0. The browser demo's CPU half is a
+  hand port nothing checks; see *The browser demo*.
 - **`StoatworksAbout.h` and `ATTRIBUTIONS.md` are provisional hand copies** with
   `guide=""`; register the project and re-run the syncs before the first release.
 - **Nothing has been through a show.**
+
+---
+
+## The browser demo
+
+`demo/` is the page at **standards-demo.stoatworks-labs.com**, a static-assets
+Worker deployed from `wrangler.toml` with `cf-run npx wrangler deploy` (no build
+step; what is committed is what is served). `demo/vendor/` is the shared kit from
+`stoatworks-backend/resolume-demo/` and is not edited here.
+
+The page runs the plugin's eight shaders, copied across unedited:
+`demo/tools/check_shaders.py` compares them with `source/Shaders.cpp` character
+for character and `tools/verify.sh` fails if one drifts. **Everything the CPU
+decides is a hand port to JavaScript** — `Model.cpp` (field positions as exact
+rationals, the temporal weights, the vertical taps), `Schedule.cpp`,
+`Controls.cpp`, `Clock.cpp` and the store bookkeeping in `ProcessOpenGL`, resize
+carry-over included — because without it the shaders have nothing to be told.
+**Nothing checks that port but a reader.** Change any of those files and change
+`demo/plugin.js` by hand to match. The negative-control perturbation bits are
+harness-only and are not carried.
+
+What the page does differently, all of it said on the page:
+
+- **The clock's unit is declared as seconds**, as `sttest` declares it; the
+  vote on Resolume's unit never runs. The page paints at the display's rate, not
+  locked to either standard, which is the plugin's position inside Resolume too.
+  Step advances exactly 1/60 s, which is how to walk the six-field cycle.
+- **A change to Temporal or Vertical Taps shows at the next output field**, not
+  on the frame the control moves — so while paused it shows nothing until Step.
+  That is the plugin's behaviour (fields are converted at their own instants),
+  kept rather than "fixed".
+- **The kit's clips move slowly**, and a converter shows most on fast motion.
+  The page says so and points at Use my own… for a real pan.
+- The About block is absent, as on every page in the suite. No audio caveat:
+  Standards has no audio path.
+
+Decided without asking, for the page: the whole CPU half is ported rather than
+a subset; the clip list starts on the geometry card, whose rim is the fastest
+motion the kit offers; the presets are the page's own (the plugin ships none),
+expressed entirely in its parameters; and a line under the canvas reports the
+ported schedule's numbers — output field, source position and the weights of the
+fields that made it — because the six-field cycle is otherwise invisible.
 
 ---
 

@@ -118,8 +118,12 @@ It has **never been loaded into Resolume on macOS**. Everything above was
 compiled, rendered and measured offline against the real plugin class in a headless
 CGL context, plus an `oxbow` load. How it looks on footage, how eight controls read
 in Arena's inspector, and what Arena's clock does to the field schedule over a long
-session are untested. On Windows, v0.1.0's CI build passed the fleet Arena gate 9 of 9 on win-lab (Resolume Arena 7.27.1, Mesa llvmpipe, no GPU, 2026-09-24): it loads from Extra Effects, registers as `SW Standards` / `ST01` / effect, all 14 host controls match the declaration, every control moves the picture, it renders and Arena's log stays clean. The gate's picture is a still, so the judder itself was not seen there. Software rendering says nothing about a GPU or about speed. No OpenFX port
-and no browser demo, neither in scope for 0.1.0. There is a [user guide](https://stoatworks-labs.com/software/standards/guide/).
+session are untested. On Windows, v0.1.0's CI build passed the fleet Arena gate 9 of 9 on win-lab (Resolume Arena 7.27.1, Mesa llvmpipe, no GPU, 2026-09-24): it loads from Extra Effects, registers as `SW Standards` / `ST01` / effect, all 14 host controls match the declaration, every control moves the picture, it renders and Arena's log stays clean. The gate's picture is a still, so the judder itself was not seen there. Software rendering says nothing about a GPU or about speed. No OpenFX port,
+not in scope for 0.1.0. There is a [user guide](https://stoatworks-labs.com/software/standards/guide/). The
+[browser demo](https://standards-demo.stoatworks-labs.com/) runs the plugin's own
+shaders, but its CPU half — the field schedule, the temporal weights and the
+vertical filter table — is a hand port to JavaScript, and nothing checks a port
+but a reader.
 
 ## Build
 
