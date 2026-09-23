@@ -90,11 +90,6 @@ public:
 	/// The block vectors of the last motion pass, (dx, dy) per block.
 	bool ReadVectorsForTest( std::vector< float >& out, int& blocksX, int& blocksY );
 
-	const standards::Schedule& ScheduleForTest() const
-	{
-		return schedule;
-	}
-
 	/// Everything the operator can reach, in the order Resolume shows them.
 	enum ParamID : FFUInt32
 	{
