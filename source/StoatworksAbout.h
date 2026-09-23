@@ -15,7 +15,7 @@ namespace stoatworks::about
 {
     inline constexpr auto name = "Standards";
     inline constexpr auto slug = "standards";
-    inline constexpr auto hook = "A field-store PAL/NTSC standards converter, for Resolume";
+    inline constexpr auto hook = "A PAL/NTSC standards converter for Resolume";
     inline constexpr auto licence = "MIT";
     inline constexpr auto guide = "https://stoatworks-labs.com/software/standards/guide/";
     inline constexpr auto page = "https://stoatworks-labs.com/software/standards/";
