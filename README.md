@@ -24,6 +24,38 @@ A field-store standards converter — PAL to NTSC and back — as an FFGL effect
 Resolume. The defaults: 625/50 → 525/59.94, two fields in time, four taps in space,
 woven onto the host's raster.</sub>
 
+<!-- downloads:start -->
+
+## Download
+
+**[v0.1.0](https://github.com/stoatworks-labs/standards/releases/tag/v0.1.0)** — prebuilt for macOS and Windows. Pick your platform:
+
+<details>
+<summary><b>macOS</b> — Universal (Apple Silicon + Intel)</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| Universal (Apple Silicon + Intel) · .dmg disk image | [`standards-0.1.0-macos-universal.dmg`](https://github.com/stoatworks-labs/standards/releases/download/v0.1.0/standards-0.1.0-macos-universal.dmg) | 225 KB |
+| Universal (Apple Silicon + Intel) · .zip archive | [`standards-macos-universal.zip`](https://github.com/stoatworks-labs/standards/releases/latest/download/standards-macos-universal.zip) | 187 KB |
+
+</details>
+
+<details>
+<summary><b>Windows</b> — x64</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| x64 · .exe installer | [`standards-0.1.0-windows-x86_64-setup.exe`](https://github.com/stoatworks-labs/standards/releases/download/v0.1.0/standards-0.1.0-windows-x86_64-setup.exe) | 222 KB |
+| x64 · .zip archive | [`standards-windows-x86_64.zip`](https://github.com/stoatworks-labs/standards/releases/latest/download/standards-windows-x86_64.zip) | 115 KB |
+
+</details>
+
+All builds, checksums and release notes: [github.com/stoatworks-labs/standards/releases](https://github.com/stoatworks-labs/standards/releases).
+
+macOS builds are signed and notarised and open normally. The Windows builds are unsigned, so SmartScreen warns once.
+
+<!-- downloads:end -->
+
 ## The one idea
 
 Until the 1990s, a programme crossing the Atlantic went through a box that turned
