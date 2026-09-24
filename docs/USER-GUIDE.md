@@ -348,7 +348,10 @@ plugin decided it was in.
   occlusion. Vertical vectors are found and applied, but no check moves anything vertically. Its
   ±16 pixel search is outrun by a fast pan at 4K.
 - **Not verified at 4K**, only timed there.
-- **No audio input and no presets.** No OpenFX version and no browser demo.
+- **No audio input and no presets.** No OpenFX version.
+- **There is a browser demo** at [standards-demo.stoatworks-labs.com](https://standards-demo.stoatworks-labs.com).
+  It is a port to a web page, not the plugin: the shaders run in WebGL2 and any CPU
+  half is rewritten in JavaScript. The page lists what it does not reproduce.
 - **Only ever run on Apple silicon** on macOS, although the macOS build contains an Intel slice.
 
 ---
