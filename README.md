@@ -96,6 +96,14 @@ two source fields, as a real one had. The display shows destination fields at ho
 frames, so 50 fields on a 60 Hz host picks up the display's own 5-in-6 cadence on
 top of the conversion's, which is true of any 50 Hz picture on a 60 Hz screen.
 
+[![Standards — a field-store PAL to NTSC converter for Resolume](docs/video-thumb.png)](https://www.youtube.com/watch?v=YZPxcWpllA0)
+
+*[Watch it](https://www.youtube.com/watch?v=YZPxcWpllA0) — 51 seconds, at 60 fps:
+the default conversion's six-field judder and combing, Bob and its double images, Drop/Repeat against Linear against Four Field, Motion Comp smoothing a pan and tearing at a tank, the vertical taps and Softness on fine lines, and Native Lines. The pans are exact moves built by the render script, because the demo clips are 30 fps. Every frame is the real plugin's output: an FFGL plugin has no window,
+so the footage is rendered by this repository's own offline harness
+(`sttest --pipe`, driven by a cue sheet) rather than filmed off a screen, and
+the clips are Resolume's bundled demo media.*
+
 ## Controls
 
 | Group | |
